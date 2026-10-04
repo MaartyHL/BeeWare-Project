@@ -65,18 +65,30 @@ class StreamingHandler(BaseHTTPRequestHandler):
                 while True:
                     with lock:
                         if output_frame is None:
-                            time.sleep(0.01)
+                            time.sleep(0.02)
                             continue
-                        encoded_img = output_frame.copy()
+                        frame_bytes = output_frame
+                    
                     self.wfile.write(b'--FRAME\r\n')
-                    self.send_header('Content-Type', 'image/jpeg')
-                    self.send_header('Content-Length', str(len(encoded_img)))
-                    self.end_headers()
-                    self.wfile.write(encoded_img)
+                    self.wfile.write(b'Content-Type: image/jpeg\r\n')
+                    self.wfile.write(f'Content-Length: {len(frame_bytes)}\r\n\r\n'.encode('utf-8'))
+                    self.wfile.write(frame_bytes)
                     self.wfile.write(b'\r\n')
+                    self.wfile.flush()
                     time.sleep(0.03)  # ~30 FPS
             except Exception:
                 pass
+        elif self.path == '/snapshot.jpg':
+            with lock:
+                if output_frame is not None:
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'image/jpeg')
+                    self.send_header('Content-Length', str(len(output_frame)))
+                    self.end_headers()
+                    self.wfile.write(output_frame)
+                    return
+            self.send_error(503)
+            self.end_headers()
         else:
             self.send_error(404)
             self.end_headers()
