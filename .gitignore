@@ -56,3 +56,23 @@ ai/training/wandb/
 
 # --- Slicers & Fichiers machines 3D ---
 *.gcode
+
+# --- SÉCURITÉ & DONNÉES SENSIBLES (Dépôt Public) ---
+# Secrets, tokens et mots de passe
+*.env
+*.env.*
+*.secret
+*secret*
+*credential*
+*password*
+*.token
+*.key
+*.pem
+id_rsa*
+id_ed25519*
+
+# Configurations réseau et Wi-Fi
+wpa_supplicant*.conf
+netplan*.yaml
+*.ovpn
+*.pcap
