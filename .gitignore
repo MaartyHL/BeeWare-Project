@@ -1,0 +1,58 @@
+# =====================================
+# BeeWare Project - .gitignore
+# =====================================
+
+# --- Système d'exploitation ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# --- Fichiers temporaires Office / Word ---
+~$*.docx
+~$*.xlsx
+~$*.pptx
+*.tmp
+
+# --- IDE (VS Code, CLion, etc.) ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+
+# --- ROS 2 & Colcon Build Artifacts ---
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+.colcon/
+
+# --- Python & Environnements virtuels ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# --- Datasets & Gros Modèles IA (>50 Mo) ---
+ai/datasets/*
+!ai/datasets/.gitkeep
+ai/training/runs/
+ai/training/wandb/
+*.pt
+*.pth
+*.tar
+*.tar.gz
+*.zip
+*.7z
+
+# --- Slicers & Fichiers machines 3D ---
+*.gcode
