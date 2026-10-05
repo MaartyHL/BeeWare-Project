@@ -13,13 +13,17 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 
+import sys
+# Permettre à l'environnement ROS 2 d'accéder aux drivers de la caméra Pi
+sys.path.append('/usr/lib/python3/dist-packages')
+
 # Messages officiels PX4
 from px4_msgs.msg import OffboardControlMode, TrajectorySetpoint
 
 try:
     from picamera2 import Picamera2
-except ImportError:
-    print("Erreur: picamera2 n'est pas disponible.")
+except ImportError as e:
+    print(f"Erreur: picamera2 n'est pas disponible ({e}).")
     exit(1)
 
 
