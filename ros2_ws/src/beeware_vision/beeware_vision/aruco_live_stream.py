@@ -3,6 +3,9 @@
 BeeWare Project - Nœud de Vision ArUco & Stream Vidéo FPV
 Capture la caméra IMX296 à 60 FPS, diffuse le flux web sur le port 5000,
 et transmet en direct les erreurs (X, Y, Taille) au nœud de vol ROS 2 via UDP local.
+
+ATTENTION : à lancer avec le Python système (3.11), pas dans l'environnement ROS 2,
+car picamera2 n'est disponible que hors micromamba.
 """
 
 import time
@@ -26,6 +29,17 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 output_frame = None
 lock = threading.Lock()
 
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = "127.0.0.1"
+    finally:
+        s.close()
+    return ip
+
 class StreamingHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         global output_frame, lock
@@ -37,7 +51,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
             <!DOCTYPE html>
             <html>
             <head>
-                <title>🐝 BeeWare Drone - FPV ArUco</title>
+                <title>BeeWare Drone - FPV ArUco</title>
                 <style>
                     body { font-family: Arial, sans-serif; background: #121212; color: #fff; text-align: center; margin: 0; padding: 20px; }
                     h1 { color: #f39c12; margin-bottom: 5px; }
@@ -46,7 +60,7 @@ class StreamingHandler(BaseHTTPRequestHandler):
                 </style>
             </head>
             <body>
-                <h1>🐝 BeeWare Project - FPV Global Shutter</h1>
+                <h1>BeeWare Project - FPV Global Shutter</h1>
                 <div class="video-box"><img src="/stream.mjpg" width="640" height="480" /></div>
             </body>
             </html>
@@ -87,18 +101,18 @@ def start_web_server(port=5000):
 def main():
     global output_frame, lock
 
-    print("🚀 Initialisation de la caméra Global Shutter (IMX296)...")
+    print("Initialisation de la caméra Global Shutter (IMX296)...")
     picam2 = Picamera2()
     config = picam2.create_video_configuration(main={"size": (640, 480), "format": "RGB888"})
     picam2.configure(config)
     picam2.start()
     time.sleep(1.0)
-    print("✅ Caméra prête !")
+    print("Caméra prête !")
 
     # Lancement du serveur Web en thread séparé
     web_thread = threading.Thread(target=start_web_server, args=(5000,), daemon=True)
     web_thread.start()
-    print("🌐 Flux vidéo actif sur : http://172.20.10.6:5000")
+    print(f"Flux vidéo actif sur : http://{get_local_ip()}:5000")
 
     dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
     parameters = cv2.aruco.DetectorParameters()
@@ -111,7 +125,7 @@ def main():
     frame_center_x = 640 // 2
     frame_center_y = 480 // 2
 
-    print("🔍 En attente du marqueur ArUco (ID 0)... (Transmission active vers ROS 2)")
+    print("En attente du marqueur ArUco (ID 0)... (Transmission active vers ROS 2)")
 
     try:
         while True:
@@ -143,7 +157,7 @@ def main():
                 cv2.line(display, (frame_center_x, frame_center_y), (marker_x, marker_y), (0, 255, 0), 2)
                 cv2.circle(display, (marker_x, marker_y), 5, (0, 0, 255), -1)
 
-                # Envoi du message UDP vers ROS 2 : "DETECTED,err_x,err_y,side_len"
+                # Envoi du message UDP vers ROS 2 : "1,err_x,err_y,side_len"
                 msg = f"1,{err_x},{err_y},{side_len:.1f}".encode('utf-8')
                 sock.sendto(msg, (UDP_IP, UDP_PORT))
                 print(f"[VISION] ArUco vu ! ErrX: {err_x:+4d}px | ErrY: {err_y:+4d}px", end='\r')

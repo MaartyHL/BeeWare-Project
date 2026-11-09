@@ -1,0 +1,45 @@
+# BeeWare Project - configuration du nœud auto_hover_node
+# Gains de départ : à régler sur banc d'essai (sans hélices), puis en vol attaché.
+auto_hover_node:
+  ros__parameters:
+    bench_mode: true            # true = banc (poussée clampée [-0.35, -0.05]) ; false = vol réel
+    mode: "auto"                # auto = suit l'ArUco si visible, sinon hover | hover | off
+    control_hz: 50.0            # boucle de contrôle (PX4 exige >= 2 Hz de setpoints)
+    udp_port: 9876              # port UDP de la vision (aruco_live_stream.py)
+
+    # Poussée (repère NED : z négatif = vers le haut)
+    base_thrust: -0.20          # poussée de base en banc
+    bench_thrust_min: -0.35
+    bench_thrust_max: -0.05
+    flight_base_thrust: -0.45   # à ajuster selon le poids réel du drone (hover)
+    flight_thrust_min: -0.80
+    flight_thrust_max: -0.10
+
+    # Clamps et sécurités
+    max_rate_rp: 0.6            # rad/s max roll/pitch
+    max_yaw_rate: 1.2           # rad/s max yaw
+    watchdog_s: 0.2             # perte de cible ArUco -> retour hover
+    deadband_px: 15.0           # zone morte pixels au centre de l'image
+    smooth_alpha: 0.35          # lissage exponentiel des commandes (0..1)
+
+    # PID altitude : erreur (m) -> delta de poussée
+    alt_kp: 0.30
+    alt_ki: 0.05
+    alt_kd: 0.20
+    alt_out_max: 0.25
+    # PID assiette : erreur (rad) -> rate (rad/s)
+    att_kp: 2.5
+    att_ki: 0.2
+    att_kd: 0.3
+    # PID cap : erreur yaw (rad) -> yaw rate (rad/s)
+    yaw_kp: 1.5
+    yaw_ki: 0.1
+    yaw_kd: 0.05
+
+    # Suivi ArUco (mode track)
+    visu_yaw_kp: 1.2            # err_x normalisée (/320) -> yaw rate
+    visu_alt_kp: 0.15           # err_y normalisée (/240) -> trim de poussée
+    visu_alt_max: 0.10
+    side_target_px: 120.0       # taille du marqueur (px) à la distance de standoff visée
+    dist_kp: 0.30               # écart relatif de taille -> assiette d'avance (rad)
+    dist_pitch_max: 0.25

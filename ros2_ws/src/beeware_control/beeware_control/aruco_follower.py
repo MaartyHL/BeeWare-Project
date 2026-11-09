@@ -10,7 +10,7 @@ import time
 class ArucoFollowerNode(Node):
     def __init__(self):
         super().__init__('aruco_follower_node')
-        
+
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
             durability=DurabilityPolicy.VOLATILE,
@@ -66,7 +66,7 @@ class ArucoFollowerNode(Node):
                 data, _ = self.udp_sock.recvfrom(1024)
                 data_str = data.decode('utf-8').strip()
                 parts = data_str.split(',')
-                
+
                 if len(parts) >= 4 and parts[0] == '1':
                     self.last_seen_time = now
                     err_x = float(parts[1])
@@ -84,7 +84,7 @@ class ArucoFollowerNode(Node):
 
                     # Calcul Hauteur (Thrust Z)
                     norm_y = max(-1.0, min(1.0, err_y / 240.0))
-                    
+
                     if self.BENCH_MODE:
                         # --- MODE BANC DE TEST ---
                         # Variation de poussée pour entendre le régime moteur (5% à 35%)
@@ -127,6 +127,7 @@ class ArucoFollowerNode(Node):
         rates_msg.yaw = self.current_yaw_rate
         rates_msg.thrust_body = [0.0, 0.0, self.current_thrust_z]
         self.rates_setpoint_pub.publish(rates_msg)
+
 
 def main(args=None):
     rclpy.init(args=args)

@@ -47,3 +47,44 @@ Installez l'extension **Remote - SSH** (`ms-vscode-remote.remote-ssh`) dans VS C
 1. `Ctrl+Shift+P` -> `Remote-SSH: Connect to Host...`
 2. Entrez `martin@barrypi.local`
 3. Ouvrez le dossier `/home/martin/BeeWare-Project/ros2_ws` sur la Pi.
+
+### Build du workspace ROS 2 (sur la Pi, dans l'environnement ROS 2 Humble)
+```bash
+cd ~/BeeWare-Project/ros2_ws
+colcon build --symlink-install
+source install/setup.bash
+```
+
+### Lancer le vol automatique (banc d'essai d'abord, sans hélices)
+Terminal 1 — vision (Python **système** 3.11, à cause de picamera2) :
+```bash
+python3 ~/BeeWare-Project/ros2_ws/src/beeware_vision/beeware_vision/aruco_live_stream.py
+```
+Terminal 2 — contrôle (environnement ROS 2) :
+```bash
+ros2 launch beeware_bringup auto_flight.launch.py bench_mode:=true mode:=auto
+```
+Ancien nœud de banc (servoing 2D yaw/poussée, validé) toujours disponible :
+```bash
+ros2 run beeware_control aruco_follower
+```
+
+### Comportement par défaut en Offboard (mode `auto`)
+Dès que le marqueur ArUco ID 0 est visible, le drone le suit (yaw, poussée, avance selon la taille) ; sinon il fait du stationnaire PID. Aucun switch de mode nécessaire. Mode courant lisible sur `/beeware/mode`.
+
+### Commandes de mode (topic `/beeware/mode_command`) — optionnelles
+```bash
+ros2 topic pub /beeware/mode_command std_msgs/msg/String "{data: 'hover'}" --once   # stationnaire PID seul (ignore le marqueur)
+ros2 topic pub /beeware/mode_command std_msgs/msg/String "{data: 'auto'}" --once    # retour au suivi auto ('track' accepté comme alias)
+ros2 topic pub /beeware/mode_command std_msgs/msg/String "{data: 'off'}" --once     # quitte l'Offboard, la RC reprend
+```
+
+### Surveiller le nœud
+```bash
+ros2 topic echo /fmu/in/vehicle_rates_setpoint
+ros2 topic echo /fmu/out/vehicle_local_position
+ros2 topic echo /fmu/out/vehicle_status
+```
+
+> Les gains PID de départ sont dans `ros2_ws/src/beeware_control/config/auto_hover.yaml` :
+> à régler sur banc d'essai (sans hélices), puis en vol attaché, avant tout vol libre.

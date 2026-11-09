@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>beeware_bringup</name>
+  <version>0.1.0</version>
+  <description>Launch files BeeWare : démarrage du nœud de vol auto (et optionnellement de la vision).</description>
+  <maintainer>Henry-Léo Martin</maintainer>
+  <license>MIT</license>
+
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
+  <depend>beeware_control</depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
