@@ -48,7 +48,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        DeclareLaunchArgument('bench_mode', default_value='true',
+        DeclareLaunchArgument('bench_mode', default_value='false',
                               description='true = banc sans hélices, false = vol réel'),
         DeclareLaunchArgument('mode', default_value='auto',
                               description='auto (suit l ArUco si visible, sinon hover) | hover | off'),

@@ -2,7 +2,7 @@
 # Gains de départ : à régler sur banc d'essai (sans hélices), puis en vol attaché.
 auto_hover_node:
   ros__parameters:
-    bench_mode: true            # true = banc (poussée clampée [-0.35, -0.05]) ; false = vol réel
+    bench_mode: false           # true = banc (poussée clampée [-0.35, -0.05]) ; false = vol réel
     mode: "auto"                # auto = suit l'ArUco si visible, sinon hover | hover | off
     control_hz: 50.0            # boucle de contrôle (PX4 exige >= 2 Hz de setpoints)
     udp_port: 9876              # port UDP de la vision (aruco_live_stream.py)
